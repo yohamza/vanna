@@ -1,1 +1,1 @@
-from vanna.mock import MockEmbedding, MockLLM, MockVectorDB
+from pyText2Sql.mock import MockEmbedding, MockLLM, MockVectorDB

@@ -3,9 +3,8 @@ from typing import List
 
 from pinecone import Pinecone, PodSpec, ServerlessSpec
 import pandas as pd
-from ..base import VannaBase
-from ..utils import deterministic_uuid
-
+from pyText2Sql.base import VannaBase
+from pyText2Sql.utils import deterministic_uuid
 from fastembed import TextEmbedding
 
 
@@ -61,7 +60,7 @@ class PineconeDB_VectorStore(VannaBase):
         self.distance_metric = config.get("distance_metric", "cosine")
         self.ddl_namespace = config.get("ddl_namespace", "ddl")
         self.sql_namespace = config.get("sql_namespace", "sql")
-        self.index_name = config.get("index_name", "vanna-index")
+        self.index_name = config.get("index_name", "text2sql")
         self.metadata_config = config.get("metadata_config", {})
         self.server_type = config.get("server_type", "serverless")
         if self.server_type not in ["serverless", "pod"]:
@@ -69,13 +68,13 @@ class PineconeDB_VectorStore(VannaBase):
         self.podspec = config.get(
             "podspec",
             PodSpec(
-                environment="us-west-2",
+                environment="us-east-1",
                 pod_type="p1.x1",
                 metadata_config=self.metadata_config,
             ),
         )
         self.serverless_spec = config.get(
-            "serverless_spec", ServerlessSpec(cloud="aws", region="us-west-2")
+            "serverless_spec", ServerlessSpec(cloud="aws", region="us-east-1")
         )
         self._setup_index()
 
@@ -114,19 +113,20 @@ class PineconeDB_VectorStore(VannaBase):
         if fetch_response["vectors"] == {}:
             return False
         return True
-
-    def add_ddl(self, ddl: str, **kwargs) -> str:
+    
+    def add_ddl(self, ddl: str, uid: str, **kwargs) -> str:
         id = deterministic_uuid(ddl) + "-ddl"
         if self._check_if_embedding_exists(id=id, namespace=self.ddl_namespace):
             print(f"DDL with id: {id} already exists in the index. Skipping...")
             return id
         self.Index.upsert(
-            vectors=[(id, self.generate_embedding(ddl), {"ddl": ddl})],
+            vectors=[(id, self.generate_embedding(ddl), { "uid": uid})],
             namespace=self.ddl_namespace,
         )
         return id
 
-    def add_documentation(self, doc: str, **kwargs) -> str:
+    
+    def add_documentation(self, doc: str, uid: str, **kwargs) -> str:
         id = deterministic_uuid(doc) + "-doc"
 
         if self._check_if_embedding_exists(
@@ -137,12 +137,12 @@ class PineconeDB_VectorStore(VannaBase):
             )
             return id
         self.Index.upsert(
-            vectors=[(id, self.generate_embedding(doc), {"documentation": doc})],
+            vectors=[(id, self.generate_embedding(doc), {"uid": uid})],
             namespace=self.documentation_namespace,
         )
         return id
 
-    def add_question_sql(self, question: str, sql: str, **kwargs) -> str:
+    def add_question_sql(self, question: str, sql: str, uid: str, **kwargs) -> str:
         question_sql_json = json.dumps(
             {
                 "question": question,
@@ -152,65 +152,60 @@ class PineconeDB_VectorStore(VannaBase):
         )
         id = deterministic_uuid(question_sql_json) + "-sql"
         if self._check_if_embedding_exists(id=id, namespace=self.sql_namespace):
-            print(
-                f"Question-SQL with id: {id} already exists in the index. Skipping..."
-            )
+            print(f"Question-SQL with id: {id} already exists in the index. Skipping...")
             return id
         self.Index.upsert(
-            vectors=[
-                (
-                    id,
-                    self.generate_embedding(question_sql_json),
-                    {"sql": question_sql_json},
-                )
-            ],
+            vectors=[(id, self.generate_embedding(question_sql_json), { "uid": uid})],
             namespace=self.sql_namespace,
         )
         return id
 
-    def get_related_ddl(self, question: str, **kwargs) -> list:
+    def get_related_ddl(self, question: str, uid: str, **kwargs) -> list:
         res = self.Index.query(
             namespace=self.ddl_namespace,
             vector=self.generate_embedding(question),
             top_k=self.n_results,
             include_values=True,
             include_metadata=True,
+            filter={"uid": uid},
         )
-        return [match["metadata"]["ddl"] for match in res["matches"]] if res else []
+        return [
+            match["metadata"]["ddl"]
+            for match in res["matches"]
+            if match["metadata"].get("uid") == uid and "ddl" in match["metadata"]
+        ] if res else []
 
-    def get_related_documentation(self, question: str, **kwargs) -> list:
+    def get_related_documentation(self, question: str, uid: str, **kwargs) -> list:
         res = self.Index.query(
             namespace=self.documentation_namespace,
             vector=self.generate_embedding(question),
             top_k=self.n_results,
             include_values=True,
             include_metadata=True,
+            filter={"uid": uid},
         )
-        return (
-            [match["metadata"]["documentation"] for match in res["matches"]]
-            if res
-            else []
-        )
+        return [match["metadata"].get("documentation", "") for match in res["matches"]] if res else []
 
-    def get_similar_question_sql(self, question: str, **kwargs) -> list:
+
+    def get_similar_question_sql(self, question: str, uid: str, **kwargs) -> list:
         res = self.Index.query(
             namespace=self.sql_namespace,
             vector=self.generate_embedding(question),
             top_k=self.n_results,
             include_values=True,
             include_metadata=True,
+            filter={"uid": uid},
         )
-        return (
-            [
-                {
-                    key: value
-                    for key, value in json.loads(match["metadata"]["sql"]).items()
-                }
-                for match in res["matches"]
-            ]
-            if res
-            else []
-        )
+        return [
+            {
+                key: value
+                for key, value in json.loads(match["metadata"]["sql"]).items()
+            }
+            for match in res["matches"]
+            if "sql" in match["metadata"] and match["metadata"]["uid"] == uid
+        ] if res else []
+
+
 
     def get_training_data(self, **kwargs) -> pd.DataFrame:
         # Pinecone does not support getting all vectors in a namespace, so we have to query for the top_k vectors with a dummy vector

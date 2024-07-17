@@ -90,7 +90,7 @@ class VannaBase(ABC):
 
         return f"Respond in the {self.language} language."
 
-    def generate_sql(self, question: str, allow_llm_to_see_data=False, **kwargs) -> str:
+    def generate_sql(self, question: str, uid: str, allow_llm_to_see_data=False, **kwargs) -> str:
         """
         Example:
         ```python
@@ -121,9 +121,14 @@ class VannaBase(ABC):
             initial_prompt = self.config.get("initial_prompt", None)
         else:
             initial_prompt = None
-        question_sql_list = self.get_similar_question_sql(question, **kwargs)
-        ddl_list = self.get_related_ddl(question, **kwargs)
-        doc_list = self.get_related_documentation(question, **kwargs)
+
+        question_sql_list = self.get_similar_question_sql(question, uid, **kwargs)
+        ddl_list = self.get_related_ddl(question, uid, **kwargs)
+        doc_list = self.get_related_documentation(question, uid, **kwargs)
+        
+        if not question_sql_list and not ddl_list and not doc_list:
+            return f"No data found for uid: {uid}"
+
         prompt = self.get_sql_prompt(
             initial_prompt=initial_prompt,
             question=question,
@@ -152,7 +157,7 @@ class VannaBase(ABC):
                         question=question,
                         question_sql_list=question_sql_list,
                         ddl_list=ddl_list,
-                        doc_list=doc_list+[f"The following is a pandas DataFrame with the results of the intermediate SQL query {intermediate_sql}: \n" + df.to_markdown()],
+                        doc_list=doc_list + [f"The following is a pandas DataFrame with the results of the intermediate SQL query {intermediate_sql}: \n" + df.to_markdown()],
                         **kwargs,
                     )
                     self.log(title="Final SQL Prompt", message=prompt)
@@ -161,8 +166,9 @@ class VannaBase(ABC):
                 except Exception as e:
                     return f"Error running intermediate SQL: {e}"
 
-
         return self.extract_sql(llm_response)
+
+
 
     def extract_sql(self, llm_response: str) -> str:
         """
@@ -1705,59 +1711,42 @@ class VannaBase(ABC):
         return sql, df, fig
 
     def train(
-        self,
-        question: str = None,
-        sql: str = None,
-        ddl: str = None,
-        documentation: str = None,
-        plan: TrainingPlan = None,
-    ) -> str:
-        """
-        **Example:**
-        ```python
-        vn.train()
-        ```
+            self,
+            question: str = None,
+            sql: str = None,
+            ddl: str = None,
+            documentation: str = None,
+            plan: TrainingPlan = None,
+            uid: str = None,
+        ) -> str:
+            
+            if question and not sql:
+                raise ValidationError("Please also provide a SQL query")
 
-        Train Vanna.AI on a question and its corresponding SQL query.
-        If you call it with no arguments, it will check if you connected to a database and it will attempt to train on the metadata of that database.
-        If you call it with the sql argument, it's equivalent to [`vn.add_question_sql()`][vanna.base.base.VannaBase.add_question_sql].
-        If you call it with the ddl argument, it's equivalent to [`vn.add_ddl()`][vanna.base.base.VannaBase.add_ddl].
-        If you call it with the documentation argument, it's equivalent to [`vn.add_documentation()`][vanna.base.base.VannaBase.add_documentation].
-        Additionally, you can pass a [`TrainingPlan`][vanna.types.TrainingPlan] object. Get a training plan with [`vn.get_training_plan_generic()`][vanna.base.base.VannaBase.get_training_plan_generic].
+            if documentation:
+                print("Adding documentation....")
+                return self.add_documentation(documentation, uid=uid)
 
-        Args:
-            question (str): The question to train on.
-            sql (str): The SQL query to train on.
-            ddl (str):  The DDL statement.
-            documentation (str): The documentation to train on.
-            plan (TrainingPlan): The training plan to train on.
-        """
+            if sql:
+                if question is None:
+                    question = self.generate_question(sql)
+                    print("Question generated with sql:", question, "\nAdding SQL...")
+                return self.add_question_sql(question=question, sql=sql, uid=uid)
 
-        if question and not sql:
-            raise ValidationError("Please also provide a SQL query")
+            if ddl:
+                print("Adding ddl:", ddl)
+                return self.add_ddl(ddl, uid=uid)
 
-        if documentation:
-            print("Adding documentation....")
-            return self.add_documentation(documentation)
+            if plan:
+                for item in plan._plan:
+                    
+                    if item.item_type == TrainingPlanItem.ITEM_TYPE_DDL:
+                        self.add_ddl(item.item_value, uid=uid)
+                    elif item.item_type == TrainingPlanItem.ITEM_TYPE_IS:
+                        self.add_documentation(item.item_value, uid=uid)
+                    elif item.item_type == TrainingPlanItem.ITEM_TYPE_SQL:
+                        self.add_question_sql(question=item.item_name, sql=item.item_value, uid=uid)
 
-        if sql:
-            if question is None:
-                question = self.generate_question(sql)
-                print("Question generated with sql:", question, "\nAdding SQL...")
-            return self.add_question_sql(question=question, sql=sql)
-
-        if ddl:
-            print("Adding ddl:", ddl)
-            return self.add_ddl(ddl)
-
-        if plan:
-            for item in plan._plan:
-                if item.item_type == TrainingPlanItem.ITEM_TYPE_DDL:
-                    self.add_ddl(item.item_value)
-                elif item.item_type == TrainingPlanItem.ITEM_TYPE_IS:
-                    self.add_documentation(item.item_value)
-                elif item.item_type == TrainingPlanItem.ITEM_TYPE_SQL:
-                    self.add_question_sql(question=item.item_name, sql=item.item_value)
 
     def _get_databases(self) -> List[str]:
         try:

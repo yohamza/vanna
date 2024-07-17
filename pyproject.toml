@@ -3,10 +3,10 @@ requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "vanna"
-version = "0.6.3"
+name = "pyText2Sql"
+version = "0.1.0"
 authors = [
-  { name="Zain Hoda", email="zain@vanna.ai" },
+  { name="yoham", email="mujhassan786@gmail.com" },
 ]
 
 description = "Generate SQL queries from natural language"

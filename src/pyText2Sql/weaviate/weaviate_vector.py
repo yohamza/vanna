@@ -2,7 +2,7 @@ import weaviate
 import weaviate.classes as wvc
 from fastembed import TextEmbedding
 
-from vanna.base import VannaBase
+from pyText2Sql.base import VannaBase
 
 
 class WeaviateDatabase(VannaBase):
