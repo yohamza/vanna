@@ -1,1 +1,1 @@
-from pyText2Sql.mock import MockEmbedding, MockLLM, MockVectorDB
+from text2sqlMetadataFilterer.mock import MockEmbedding, MockLLM, MockVectorDB

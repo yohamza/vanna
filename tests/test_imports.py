@@ -1,38 +1,38 @@
 
 
 def test_regular_imports():
-    from pyText2Sql.anthropic.anthropic_chat import Anthropic_Chat
-    from pyText2Sql.base.base import VannaBase
-    from pyText2Sql.chromadb.chromadb_vector import ChromaDB_VectorStore
-    from pyText2Sql.hf.hf import Hf
-    from pyText2Sql.local import LocalContext_OpenAI
-    from pyText2Sql.marqo.marqo import Marqo_VectorStore
-    from pyText2Sql.milvus.milvus_vector import Milvus_VectorStore
-    from pyText2Sql.mistral.mistral import Mistral
-    from pyText2Sql.ollama.ollama import Ollama
-    from pyText2Sql.openai.openai_chat import OpenAI_Chat
-    from pyText2Sql.openai.openai_embeddings import OpenAI_Embeddings
-    from pyText2Sql.opensearch.opensearch_vector import OpenSearch_VectorStore
-    from pyText2Sql.pinecone.pinecone_vector import PineconeDB_VectorStore
-    from pyText2Sql.remote import VannaDefault
-    from pyText2Sql.vannadb.vannadb_vector import VannaDB_VectorStore
-    from pyText2Sql.weaviate.weaviate_vector import WeaviateDatabase
-    from pyText2Sql.ZhipuAI.ZhipuAI_Chat import ZhipuAI_Chat
-    from pyText2Sql.ZhipuAI.ZhipuAI_embeddings import ZhipuAI_Embeddings
+    from text2sqlMetadataFilterer.anthropic.anthropic_chat import Anthropic_Chat
+    from text2sqlMetadataFilterer.base.base import VannaBase
+    from text2sqlMetadataFilterer.chromadb.chromadb_vector import ChromaDB_VectorStore
+    from text2sqlMetadataFilterer.hf.hf import Hf
+    from text2sqlMetadataFilterer.local import LocalContext_OpenAI
+    from text2sqlMetadataFilterer.marqo.marqo import Marqo_VectorStore
+    from text2sqlMetadataFilterer.milvus.milvus_vector import Milvus_VectorStore
+    from text2sqlMetadataFilterer.mistral.mistral import Mistral
+    from text2sqlMetadataFilterer.ollama.ollama import Ollama
+    from text2sqlMetadataFilterer.openai.openai_chat import OpenAI_Chat
+    from text2sqlMetadataFilterer.openai.openai_embeddings import OpenAI_Embeddings
+    from text2sqlMetadataFilterer.opensearch.opensearch_vector import OpenSearch_VectorStore
+    from text2sqlMetadataFilterer.pinecone.pinecone_vector import PineconeDB_VectorStore
+    from text2sqlMetadataFilterer.remote import VannaDefault
+    from text2sqlMetadataFilterer.vannadb.vannadb_vector import VannaDB_VectorStore
+    from text2sqlMetadataFilterer.weaviate.weaviate_vector import WeaviateDatabase
+    from text2sqlMetadataFilterer.ZhipuAI.ZhipuAI_Chat import ZhipuAI_Chat
+    from text2sqlMetadataFilterer.ZhipuAI.ZhipuAI_embeddings import ZhipuAI_Embeddings
 
 def test_shortcut_imports():
-    from pyText2Sql.anthropic import Anthropic_Chat
-    from pyText2Sql.base import VannaBase
-    from pyText2Sql.chromadb import ChromaDB_VectorStore
-    from pyText2Sql.hf import Hf
-    from pyText2Sql.marqo import Marqo_VectorStore
-    from pyText2Sql.milvus import Milvus_VectorStore
-    from pyText2Sql.mistral import Mistral
-    from pyText2Sql.ollama import Ollama
-    from pyText2Sql.openai import OpenAI_Chat, OpenAI_Embeddings
-    from pyText2Sql.opensearch import OpenSearch_VectorStore
-    from pyText2Sql.pinecone import PineconeDB_VectorStore
-    from pyText2Sql.vannadb import VannaDB_VectorStore
-    from pyText2Sql.vllm import Vllm
-    from pyText2Sql.weaviate import WeaviateDatabase
-    from pyText2Sql.ZhipuAI import ZhipuAI_Chat, ZhipuAI_Embeddings
+    from text2sqlMetadataFilterer.anthropic import Anthropic_Chat
+    from text2sqlMetadataFilterer.base import VannaBase
+    from text2sqlMetadataFilterer.chromadb import ChromaDB_VectorStore
+    from text2sqlMetadataFilterer.hf import Hf
+    from text2sqlMetadataFilterer.marqo import Marqo_VectorStore
+    from text2sqlMetadataFilterer.milvus import Milvus_VectorStore
+    from text2sqlMetadataFilterer.mistral import Mistral
+    from text2sqlMetadataFilterer.ollama import Ollama
+    from text2sqlMetadataFilterer.openai import OpenAI_Chat, OpenAI_Embeddings
+    from text2sqlMetadataFilterer.opensearch import OpenSearch_VectorStore
+    from text2sqlMetadataFilterer.pinecone import PineconeDB_VectorStore
+    from text2sqlMetadataFilterer.vannadb import VannaDB_VectorStore
+    from text2sqlMetadataFilterer.vllm import Vllm
+    from text2sqlMetadataFilterer.weaviate import WeaviateDatabase
+    from text2sqlMetadataFilterer.ZhipuAI import ZhipuAI_Chat, ZhipuAI_Embeddings

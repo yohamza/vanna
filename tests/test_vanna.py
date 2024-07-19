@@ -1,11 +1,11 @@
 import os
 
-from pyText2Sql.anthropic.anthropic_chat import Anthropic_Chat
-from pyText2Sql.google import GoogleGeminiChat
-from pyText2Sql.mistral.mistral import Mistral
-from pyText2Sql.openai.openai_chat import OpenAI_Chat
-from pyText2Sql.remote import VannaDefault
-from pyText2Sql.vannadb.vannadb_vector import VannaDB_VectorStore
+from text2sqlMetadataFilterer.anthropic.anthropic_chat import Anthropic_Chat
+from text2sqlMetadataFilterer.google import GoogleGeminiChat
+from text2sqlMetadataFilterer.mistral.mistral import Mistral
+from text2sqlMetadataFilterer.openai.openai_chat import OpenAI_Chat
+from text2sqlMetadataFilterer.remote import VannaDefault
+from text2sqlMetadataFilterer.vannadb.vannadb_vector import VannaDB_VectorStore
 
 try:
     print("Trying to load .env")
@@ -59,7 +59,7 @@ def test_vn_default():
     df = vn_default.run_sql(sql)
     assert len(df) == 6
 
-from pyText2Sql.qdrant import Qdrant_VectorStore
+from text2sqlMetadataFilterer.qdrant import Qdrant_VectorStore
 
 
 class VannaQdrant(Qdrant_VectorStore, OpenAI_Chat):
@@ -84,8 +84,8 @@ def test_vn_qdrant():
     df = vn_qdrant.run_sql(sql)
     assert len(df) == 7
 
-from pyText2Sql.chromadb.chromadb_vector import ChromaDB_VectorStore
-from pyText2Sql.openai.openai_chat import OpenAI_Chat
+from text2sqlMetadataFilterer.chromadb.chromadb_vector import ChromaDB_VectorStore
+from text2sqlMetadataFilterer.openai.openai_chat import OpenAI_Chat
 
 
 class MyVanna(ChromaDB_VectorStore, OpenAI_Chat):
@@ -112,7 +112,7 @@ def test_vn_chroma():
     assert len(df) == 7
 
 
-from pyText2Sql.milvus import Milvus_VectorStore
+from text2sqlMetadataFilterer.milvus import Milvus_VectorStore
 
 
 class VannaMilvus(Milvus_VectorStore, OpenAI_Chat):

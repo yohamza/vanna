@@ -1,14 +1,14 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="pyText2Sql",
+    name="text2sql-metadata-filterer",
     version="0.1.0",
-    author="yoham",
-    author_email="mujhassan786@gmail.com",
+    author="yohamza",
+    author_email="hamza.io@hotmail.com",
     description="Generate SQL queries from natural language",
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    url="https://github.com/vanna-ai/vanna",
+    url="https://github.com/yohamza/vanna-metadata-filter",
     packages=find_packages(where='src'),
     package_dir={'': 'src'},
     classifiers=[

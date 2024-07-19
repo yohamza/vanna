@@ -3,10 +3,10 @@ requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "pyText2Sql"
+name = "text2sql-metadata-filterer"
 version = "0.1.0"
 authors = [
-  { name="yoham", email="mujhassan786@gmail.com" },
+  { name="yohamza", email="hamza.io@hotmail.com" },
 ]
 
 description = "Generate SQL queries from natural language"
@@ -22,8 +22,8 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/vanna-ai/vanna"
-"Bug Tracker" = "https://github.com/vanna-ai/vanna/issues"
+"Homepage" = "https://github.com/yohamza/vanna-metadata-filter"
+"Bug Tracker" = "https://github.com/yohamza/vanna-metadata-filter/issues"
 
 [project.optional-dependencies]
 postgres = ["psycopg2-binary", "db-dtypes"]

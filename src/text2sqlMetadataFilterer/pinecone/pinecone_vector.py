@@ -3,8 +3,8 @@ from typing import List
 
 from pinecone import Pinecone, PodSpec, ServerlessSpec
 import pandas as pd
-from pyText2Sql.base import VannaBase
-from pyText2Sql.utils import deterministic_uuid
+from text2sqlMetadataFilterer.base import VannaBase
+from text2sqlMetadataFilterer.utils import deterministic_uuid
 from fastembed import TextEmbedding
 
 
